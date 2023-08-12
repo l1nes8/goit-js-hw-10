@@ -1,29 +1,14 @@
+import Notiflix from 'notiflix';
 import SlimSelect from 'slim-select';
 import 'slim-select/dist/slimselect.css';
-import Notiflix from 'notiflix';
-import { renderBreed } from './createMarkup.js';
-
-import axios from 'axios';
+import { createMarkup } from './createMarkup.js';
+import { refs } from './refs.js';
 
 const URL = 'https://api.thecatapi.com/v1/breeds';
 const API_KEY =
   'live_ZRhb9QDqxOnsayJ7SBwmz2cdAH5d3wcwd1nW40wI4YVwoMzYP3fvG0Z6NwvzBO0k';
 
-const refs = {
-  breedSelect: document.querySelector('.breed-select'),
-  loader: document.querySelector('.loader'),
-  error: document.querySelector('.error'),
-  catInfo: document.querySelector('.cat-info'),
-};
-
-fetchBreeds()
-  .then(render)
-  .catch(error => {
-    refs.loader.classList.remove('loader-is-visible');
-    Notiflix.Notify.failure(
-      'Oops! Something went wrong! Try reloading the page!'
-    );
-  });
+fetchBreeds().then(render).catch(onError);
 
 export function fetchBreeds() {
   refs.loader.classList.add('loader-is-visible');
@@ -70,13 +55,11 @@ function onChange(e) {
   page += 1;
 
   fetchCatByBreed(selectedOption)
-    .then(res => renderBreed(res))
-    .catch(error => {
+    .then(res => {
+      refs.catInfo.innerHTML = createMarkup(res);
       refs.loader.classList.remove('loader-is-visible');
-      Notiflix.Notify.failure(
-        'Oops! Something went wrong! Try reloading the page!'
-      );
-    });
+    })
+    .catch(onError);
 }
 
 function fetchCatByBreed(breedId) {
@@ -90,4 +73,11 @@ function fetchCatByBreed(breedId) {
   ).then(response => {
     return response.json();
   });
+}
+
+function onError() {
+  refs.loader.classList.remove('loader-is-visible');
+  Notiflix.Notify.failure(
+    'Oops! Something went wrong! Try reloading the page!'
+  );
 }
