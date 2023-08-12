@@ -67,13 +67,12 @@ function onChange(e) {
   const option = e.currentTarget;
   const selectedOption = option.value;
 
-  page = 1;
+  page += 1;
 
   fetchCatByBreed(selectedOption)
     .then(res => renderBreed(res))
     .catch(error => {
       refs.loader.classList.remove('loader-is-visible');
-      refs.catInfo.innerHTML = '';
       Notiflix.Notify.failure(
         'Oops! Something went wrong! Try reloading the page!'
       );
